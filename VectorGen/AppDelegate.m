@@ -48,6 +48,8 @@
     // Insert code here to tear down your application
 }
 
+#pragma mark - Menu actions
+//Show / Hide grid
 -(IBAction)showGridItem:(NSMenuItem*)sender{
 
     if(sender.state != NSOnState) [sender setState:NSOnState];
@@ -57,6 +59,7 @@
     [[NSNotificationCenter defaultCenter] postNotificationName:kShowGridNotification object:nil userInfo:@{kShowValue:showBool}];
 }
 
+//Toggle 'Snap to Grid'
 -(IBAction)toggleSnapToGridItem:(NSMenuItem*)sender{
     
     if(sender.state != NSOnState) [sender setState:NSOnState];
@@ -67,17 +70,17 @@
     
 }
 
+//Create an image overlay
 -(IBAction)newImageOverlay:(NSMenuItem*)sender{
     
-    //create imageOverlayView
      [[NSNotificationCenter defaultCenter] postNotificationName:kNewImageOverlayNotification object:nil userInfo:nil];
 }
 
+//Simulate current vector doc on a Vectrex
 -(IBAction)simulateItem:(NSMenuItem*)sender{
-    
-    //TODO SHOW SIMULATION OF CURRENT WINDOW!
-    
+    //TODO Show simulation of current vector doc on a Vectrex
 }
+
 
 -(void)applySettings{
     

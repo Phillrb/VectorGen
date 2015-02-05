@@ -77,25 +77,6 @@
     
 }
 
-//-(NSView*)hitTest:(NSPoint)aPoint {
-//
-//    NSView *tmpView = [super hitTest:aPoint];
-//    
-//    NSLog(@"%@", NSStringFromClass([tmpView class]));
-//    
-//    if(!([tmpView isKindOfClass:[PRBVectorScreenView class]]
-//         || [tmpView isKindOfClass:[PRBVectorPointView class]]
-//         || [tmpView isKindOfClass:[NSTextView class]]
-//         || [tmpView isKindOfClass:[NSButton class]]
-//         || [tmpView isKindOfClass:[PRBImageOverlayView class]]
-//         || [tmpView isKindOfClass:[PRBVectorConnectionView class]]))
-//       {
-//           return nil;
-//       }
-// 
-//    return tmpView;
-//}
-
 #pragma mark - image overlay
 
 -(void)newImageOverlay:(NSNotification*)notif{
@@ -103,8 +84,7 @@
     //Is this the active window?
     if([NSApplication sharedApplication].keyWindow != [self window]) return;
     
-    //TODO
-    //REQUEST AN IMAGE IS SELECTED
+    //Open an image from file
     NSOpenPanel* panel = [NSOpenPanel openPanel];
     [panel setCanChooseDirectories:NO];
     [panel setAllowedFileTypes:@[@"png",@"jpg",@"gif",@"jpeg"]];
@@ -126,7 +106,6 @@
     
     NSImage* img = [[NSImage alloc] initWithContentsOfURL:fileURL];
     
-//    w \ h = img.size.width \ img.size.height
     float imgWidth = img.size.width;
     float imgHeight = img.size.height;
     

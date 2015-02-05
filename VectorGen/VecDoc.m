@@ -64,9 +64,20 @@
     
     NSMutableString *output = [[NSMutableString alloc] init];
     
+    int pos = 0;
+    BOOL isFirst = YES;
     for (PRBVectorPointView* point in screenView.vectorPoints)
     {
-        [output appendString:[screenView stringValueForPoint:point]];
+        if (pos > 0)
+        {
+            [output appendString:[screenView stringValueForPoint:point isFirst:isFirst]];
+            isFirst = NO;
+        }
+        pos++;
+    }
+    
+    if (screenView.vectorPoints.count > 0) {
+        [output appendString:@"\n1,"];
     }
     
     return [output dataUsingEncoding:NSUTF8StringEncoding];

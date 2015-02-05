@@ -40,7 +40,7 @@
 
 @property(nonatomic,strong) NSMutableArray* vectorPoints;
 
--(NSString*)stringValueForPoint:(PRBVectorPointView*)point;
+-(NSString*)stringValueForPoint:(PRBVectorPointView*)point isFirst:(BOOL)isFirst;
 
 -(void)displayPointsFromString:(NSString*)pointsStr;
 

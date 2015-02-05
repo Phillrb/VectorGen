@@ -165,30 +165,19 @@
     [self setFrameOrigin:NSPointFromCGPoint(centerPoint)];
 }
 
+#define kGridSpacing 10 // also hardcoded in vector screen
 
 //Snap to grid
 -(void)moveToNearestGridPoint
 {
-    //TODO Screen View should fulfil this
-    //HERE
-
     int lastDiffX = INT_MAX;
     int gridX = self.viewCenter.x;
     
     int lastDiffY = INT_MAX;
     int gridY = self.viewCenter.y;
     
-    
-//    for (int x = 0; x <=self.superview.frame.size.width; x+= self.superview.frame.size.width / 20.0f) {
-//        int diffX = MAX(abs(x), abs(self.viewCenter.x)) - MIN(abs(x), abs(self.viewCenter.x));
-//        if(diffX < lastDiffX ) {
-//            lastDiffX = diffX;
-//            gridX = x;
-//        }
-//    }
-    
-    
-    for (int i = 0; i <= 128; i+=10) {
+    //TODO Move this logic to Vector screen
+    for (int i = 0; i <= 128; i+=kGridSpacing) {
         NSPoint xPoint = NSPointFromCGPoint([PRBVectorPointView convertVectexCoord:CGPointMake(i, -127) toViewCenterInView:self.superview]);
         int diffX = MAX(abs(xPoint.x), abs(self.viewCenter.x)) - MIN(abs(xPoint.x), abs(self.viewCenter.x));
         if(diffX < lastDiffX ) {
@@ -204,7 +193,7 @@
         }
     }
     
-    for (int i = -10; i >= -127; i-=10) {
+    for (int i = -10; i >= -127; i-=kGridSpacing) {
         NSPoint xPoint = NSPointFromCGPoint([PRBVectorPointView convertVectexCoord:CGPointMake(i, 128) toViewCenterInView:self.superview]);
         int diffX = MAX(abs(xPoint.x), abs(self.viewCenter.x)) - MIN(abs(xPoint.x), abs(self.viewCenter.x));
         if(diffX < lastDiffX ) {
@@ -219,34 +208,6 @@
             gridY = yPoint.y;
         }
     }
-    
-//        NSPoint topPoint = NSPointFromCGPoint([PRBVectorPointView convertVectexCoord:CGPointMake(i, -127) toViewCenterInView:self]);
-//        NSPoint bottomPoint = NSPointFromCGPoint([PRBVectorPointView convertVectexCoord:CGPointMake(i, 128) toViewCenterInView:self]);
-//        
-//        //Draw a vector
-//        [NSBezierPath strokeLineFromPoint:topPoint toPoint:bottomPoint];
-//        
-//        NSPoint topPoint2 = NSPointFromCGPoint([PRBVectorPointView convertVectexCoord:CGPointMake(-127, i) toViewCenterInView:self]);
-//        NSPoint bottomPoint2 = NSPointFromCGPoint([PRBVectorPointView convertVectexCoord:CGPointMake(128, i) toViewCenterInView:self]);
-//        
-//        //Draw a vector
-//        [NSBezierPath strokeLineFromPoint:topPoint2 toPoint:bottomPoint2];
-//    }
-//    
-//    for (int i = -10; i >= -127; i-=10) {
-    
-    
-    
-    
-//    int lastDiffY = INT_MAX;
-//    int gridY = self.viewCenter.y;
-//    for (int y = 0; y <=self.superview.frame.size.height; y+= self.superview.frame.size.height / 30.0f) {
-//        int diffY = MAX(abs(y), abs(self.viewCenter.y)) - MIN(abs(y), abs(self.viewCenter.y));
-//        if(diffY < lastDiffY ) {
-//            lastDiffY = diffY;
-//            gridY = y;
-//        }
-//    }
     
     [self goToPoint:CGPointMake(gridX, gridY)];
 }

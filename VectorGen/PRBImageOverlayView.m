@@ -181,66 +181,8 @@ NSPoint currentOrigin;
 #pragma mark - resizer
 
 -(void)resizeView:(PRBResizeView *)resizeView requestsResizeToPoint:(NSPoint)point{
-    
-    
     [self setFrame:NSMakeRect(self.frame.origin.x, self.frame.origin.y, point.x, point.y)];
-    
 }
-
-////Check to see if tapping points below this image view
-//-(NSView*)hitTest:(NSPoint)aPoint {
-// 
-//    NSView* touchView = [super hitTest:aPoint];
-//
-//    if (touchView == _imageView) {
-//     
-//       if(_delegate && [_delegate respondsToSelector:@selector(firstVectorPointAtPoint:)])
-//       {
-//           //Was the touch above the screen view
-//           NSRect vecScreenFrameRec = ((NSView*)_delegate).frame;
-//           NSPoint touchPointInSuper = NSMakePoint(aPoint.x + self.frame.origin.x, aPoint.y - self.frame.origin.y);
-//           
-//           //is touchPointInSuper actually correct for entire window?
-//           
-//           
-//           //PRB THIS IS ALL WRONG!!!
-//           
-//           //IS THIS TAP WITHIN THE VECTOR SCREEN VIEW?
-//           //IS THIS TAP RIGHT ABOVE A VEC POINT?
-//            // RETURN POINT
-//           
-//           
-//           
-//           
-//           
-////           
-////           //Convert this point to a point in delegate view
-////           if (NSPointInRect(touchPointInSuper, screenRect))
-////           {
-////               
-////               NSPoint relativePointSuper = [((NSView*)_delegate) convertPoint:touchPointInSuper fromView:((NSView*)_delegate).superview];
-////               
-////               //TODO CONVERSION WRONG!!!!!!
-////               NSPoint relativePoint = NSMakePoint(relativePointSuper.x - self.frame.origin.x, relativePointSuper.y - self.frame.origin.y);
-////               
-////               NSLog(@"%.0f,%.0f", relativePoint.x, relativePoint.y);
-////               
-////               PRBVectorPointView* point = [_delegate firstVectorPointAtPoint:relativePoint];
-////               
-////               if(point)
-////               {
-////                   NSLog(@"TOUCHED POINT!!!");
-////                   return point;
-////               }
-////               
-////           }
-//           
-//
-//       }
-//    }
-//    
-//    return touchView;
-//}
 
 #pragma mark - drawing
 - (void)drawRect:(NSRect)dirtyRect {

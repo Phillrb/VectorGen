@@ -25,13 +25,16 @@
 //	SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #import "PRBVectorScreenView.h"
-
-//TODO
-//TEXTVIEW ON RIGHT - live edit
-//Transparent image overlay - needs to allow touches through
-//UNDO / REDO
-//Delete point
-//Simulate button
+/**********************
+* SUGGESTED ADDITIONS:
+*
+* * Live edit textview on right to alter positions of vector points on vector screen
+* * Image Overlays should pass taps through to the vector screen below
+* * Undo / Redo feature (store all events to a stack)
+* * Delete a point
+* * Simulation - press button to simulate current image on Vectrex (don't foget buzz!)
+* * Grid spacing - variable size grid spacing
+ **********************/
 
 @interface PRBVectorScreenView() <PRBVectorPointViewDelegate>
 
@@ -211,39 +214,37 @@
         [newVectorPoint setIsMoveCommand:isMove];
     }
     
-
-        //Connection points
-        if(!contextPoint) contextPoint = [_vectorPoints lastObject];
+    //Connection points
+    if(!contextPoint) contextPoint = [_vectorPoints lastObject];
+    
+    //Is new point at start of list?
+    if(_vectorPoints.count > 1 && contextPoint == [_vectorPoints firstObject])
+    {
+        //Put new point before the first point - so connection point will be before this point
+        [self createNewConnectionViewBetweenSrcPoint:newVectorPoint andDstPoint:contextPoint];
         
-        //Is new point at start of list?
-        if(_vectorPoints.count > 1 && contextPoint == [_vectorPoints firstObject])
+        //Alter move commands for first in list
+        if (contextPoint.isMoveCommand) [contextPoint setIsMoveCommand:NO];
+        [newVectorPoint setIsMoveCommand:YES];
+    }
+    else
+    {
+        //Update next connection point
+        if(contextPoint != [_vectorPoints lastObject])
         {
-            //Put new point before the first point - so connection point will be before this point
-            [self createNewConnectionViewBetweenSrcPoint:newVectorPoint andDstPoint:contextPoint];
-            
-            //Alter move commands for first in list
-            if (contextPoint.isMoveCommand) [contextPoint setIsMoveCommand:NO];
-            [newVectorPoint setIsMoveCommand:YES];
+            [newVectorPoint setNextConnectionView:contextPoint.nextConnectionView];
+            [self updateConnectionViewPosition:newVectorPoint.nextConnectionView betweenSrcPoint:newVectorPoint andDstPoint:[_vectorPoints objectAtIndex:[_vectorPoints indexOfObject:contextPoint] + 1]];
         }
-        else
+         
+        //Put new connection point after this point
+        [self createNewConnectionViewBetweenSrcPoint:contextPoint andDstPoint:newVectorPoint];
+        
+        //First is a move
+        if(isFirstPoint)
         {
-            //Update next connection point
-            if(contextPoint != [_vectorPoints lastObject])
-            {
-                [newVectorPoint setNextConnectionView:contextPoint.nextConnectionView];
-                [self updateConnectionViewPosition:newVectorPoint.nextConnectionView betweenSrcPoint:newVectorPoint andDstPoint:[_vectorPoints objectAtIndex:[_vectorPoints indexOfObject:contextPoint] + 1]];
-            }
-             
-            //Put new connection point after this point
-            [self createNewConnectionViewBetweenSrcPoint:contextPoint andDstPoint:newVectorPoint];
-            
-            //First is a move
-            if(isFirstPoint)
-            {
-                [newVectorPoint.previousConnectionView setIsConnected:NO];
-            }
+            [newVectorPoint.previousConnectionView setIsConnected:NO];
         }
-//    }
+    }
     
     //Add it to the array of vector points
     if(!contextPoint || (contextPoint && contextPoint == [_vectorPoints lastObject]))
@@ -271,6 +272,7 @@
     
 }
 
+#pragma mark - PRBVectorPointViewDelegate
 -(void)vectorPointViewDidMove:(PRBVectorPointView *)vectorPointView{
 
     [self moveConnectionViewsForPoint:vectorPointView];
@@ -310,10 +312,10 @@
     [self setNeedsDisplay:YES];
 }
 
--(NSString*)stringValueForPoint:(PRBVectorPointView*)point{
+-(NSString*)stringValueForPoint:(PRBVectorPointView*)point isFirst:(BOOL)isFirst{
 
 return [NSString stringWithFormat:@"%@%@, %@,",
-    (_vectorPoints.count > 0 && [_vectorPoints objectAtIndex:0] == point) ? @"" : @"\n",
+    isFirst ? @"" : @"\n",
     point.isMoveCommand ? @"0": @"255",
         [point coordinateString]];
 }
@@ -375,6 +377,7 @@ return [NSString stringWithFormat:@"%@%@, %@,",
     
 }
 
+//Convert string representation of vector image to vector points
 -(void)displayPointsFromString:(NSString *)pointsStr{
     
     //Clear existing points
@@ -490,11 +493,7 @@ return [NSString stringWithFormat:@"%@%@, %@,",
     
     NSArray* vecPoints = [NSArray arrayWithArray:_vectorPoints];
     
-//    NSLog(@"POINT: %.0f,%.0f", point.x, point.y);
-    
     for (PRBVectorPointView* vec in vecPoints) {
-        
-//        NSLog(@"VEC: %.2f, %.2f", vec.frame.origin.x, vec.frame.origin.y);
         
         if(NSPointInRect(point, vec.frame) )
         {
@@ -527,9 +526,15 @@ return [NSString stringWithFormat:@"%@%@, %@,",
     //Clear text view
     [_vectorTxt setString:@""];
     
+    bool isFirst = YES;
     for (PRBVectorPointView* vectorPoint in tmpVecs) {
         
-        [_vectorTxt setString:[_vectorTxt.string stringByAppendingString:[self stringValueForPoint:vectorPoint]]];
+        //Ignore center point
+        if(previousVectorPoint)
+        {
+            [_vectorTxt setString:[_vectorTxt.string stringByAppendingString:[self stringValueForPoint:vectorPoint isFirst:isFirst]]];
+            isFirst = NO;
+        }
         
         //Only draw a vector between valid points
         if (!vectorPoint.isMoveCommand && previousVectorPoint) {
@@ -546,13 +551,15 @@ return [NSString stringWithFormat:@"%@%@, %@,",
     
 }
 
+
+#define kGridSpacing 10 // Also hard-coded into vector point view
 -(void)drawGridIfNeeded
 {
     [[NSColor colorWithRed:1.0f green:1.0f blue:0.0f alpha:.3f] setStroke];
     
     if(_isShowGrid)
     {
-        for (int i = 0; i <= 128; i+=10) {
+        for (int i = 0; i <= 128; i+=kGridSpacing) {
             
             NSPoint topPoint = NSPointFromCGPoint([PRBVectorPointView convertVectexCoord:CGPointMake(i, -127) toViewCenterInView:self]);
             NSPoint bottomPoint = NSPointFromCGPoint([PRBVectorPointView convertVectexCoord:CGPointMake(i, 128) toViewCenterInView:self]);
@@ -567,7 +574,7 @@ return [NSString stringWithFormat:@"%@%@, %@,",
             [NSBezierPath strokeLineFromPoint:topPoint2 toPoint:bottomPoint2];
         }
         
-        for (int i = -10; i >= -127; i-=10) {
+        for (int i = -10; i >= -127; i-=kGridSpacing) {
             
             NSPoint topPoint = NSPointFromCGPoint([PRBVectorPointView convertVectexCoord:CGPointMake(i, -127) toViewCenterInView:self]);
             NSPoint bottomPoint = NSPointFromCGPoint([PRBVectorPointView convertVectexCoord:CGPointMake(i, 128) toViewCenterInView:self]);
@@ -581,25 +588,6 @@ return [NSString stringWithFormat:@"%@%@, %@,",
             //Draw a vector
             [NSBezierPath strokeLineFromPoint:topPoint2 toPoint:bottomPoint2];
         }
-        
-        
-//        for (int x = 0; x <=self.frame.size.width; x+= self.frame.size.width / 20.0f) {
-//            
-//            NSPoint topPoint = NSPointFromCGPoint(CGPointMake(x, 0.0f));
-//            NSPoint bottomPoint = NSPointFromCGPoint(CGPointMake(x, self.frame.size.height));
-//            
-//            //Draw a vector
-//            [NSBezierPath strokeLineFromPoint:topPoint toPoint:bottomPoint];
-//        }
-//        
-//        for (int y = 0; y <=self.frame.size.height; y+= self.frame.size.height / 30.0f) {
-//            
-//            NSPoint leftPoint = NSPointFromCGPoint(CGPointMake(0.0f, y));
-//            NSPoint rightPoint = NSPointFromCGPoint(CGPointMake(self.frame.size.width, y));
-//            
-//            //Draw a vector
-//            [NSBezierPath strokeLineFromPoint:leftPoint toPoint:rightPoint];
-//        }
     }
 }
 
