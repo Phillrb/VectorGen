@@ -211,39 +211,43 @@
     }
     else
     {
-        [newVectorPoint setIsMoveCommand:isMove];
+        if(contextPoint == [_vectorPoints firstObject])
+        {
+            //Inserting new point just after center point
+            [newVectorPoint setIsMoveCommand:YES];
+            isFirstPoint = YES;
+        }
+        else
+        {
+           [newVectorPoint setIsMoveCommand:isMove];
+        }
+            
     }
     
     //Connection points
     if(!contextPoint) contextPoint = [_vectorPoints lastObject];
     
-    //Is new point at start of list?
-    if(_vectorPoints.count > 1 && contextPoint == [_vectorPoints firstObject])
+    //Update next connection point
+    if(contextPoint != [_vectorPoints lastObject])
     {
-        //Put new point before the first point - so connection point will be before this point
-        [self createNewConnectionViewBetweenSrcPoint:newVectorPoint andDstPoint:contextPoint];
+        [newVectorPoint setNextConnectionView:contextPoint.nextConnectionView];
+        [self updateConnectionViewPosition:newVectorPoint.nextConnectionView betweenSrcPoint:newVectorPoint andDstPoint:[_vectorPoints objectAtIndex:[_vectorPoints indexOfObject:contextPoint] + 1]];
         
-        //Alter move commands for first in list
-        if (contextPoint.isMoveCommand) [contextPoint setIsMoveCommand:NO];
-        [newVectorPoint setIsMoveCommand:YES];
+        if(isFirstPoint){
+            //Next point no longer is a move
+            [[_vectorPoints objectAtIndex:[_vectorPoints indexOfObject:contextPoint] + 1] setIsMoveCommand:NO];
+            [newVectorPoint.nextConnectionView setIsConnected:YES];
+        };
+        
     }
-    else
+     
+    //Put new connection point after this point
+    [self createNewConnectionViewBetweenSrcPoint:contextPoint andDstPoint:newVectorPoint];
+    
+    //First is a move
+    if(isFirstPoint)
     {
-        //Update next connection point
-        if(contextPoint != [_vectorPoints lastObject])
-        {
-            [newVectorPoint setNextConnectionView:contextPoint.nextConnectionView];
-            [self updateConnectionViewPosition:newVectorPoint.nextConnectionView betweenSrcPoint:newVectorPoint andDstPoint:[_vectorPoints objectAtIndex:[_vectorPoints indexOfObject:contextPoint] + 1]];
-        }
-         
-        //Put new connection point after this point
-        [self createNewConnectionViewBetweenSrcPoint:contextPoint andDstPoint:newVectorPoint];
-        
-        //First is a move
-        if(isFirstPoint)
-        {
-            [newVectorPoint.previousConnectionView setIsConnected:NO];
-        }
+        [newVectorPoint.previousConnectionView setIsConnected:NO];
     }
     
     //Add it to the array of vector points
@@ -251,11 +255,6 @@
     {
         //Add on end
         [_vectorPoints addObject:newVectorPoint];
-    }
-    else if(contextPoint && contextPoint == [_vectorPoints firstObject])
-    {
-        //Add at start
-        [_vectorPoints insertObject:newVectorPoint atIndex:0];
     }
     else if(contextPoint)
     {
