@@ -30,6 +30,8 @@
 
 @interface VecDoc ()
 
+@property(nonatomic,assign) BOOL isOptimiseOnSave;
+
 @end
 
 @implementation VecDoc
@@ -37,9 +39,26 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
-        // Add your subclass-specific initialization here.
-    }
+		[self setup];
+	}
     return self;
+}
+
+-(void)setup {
+	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+	_isOptimiseOnSave = [defaults boolForKey:kOptimiseOnSave];
+	[[NSNotificationCenter defaultCenter] addObserver:self
+											 selector:@selector(toggleOptimise:)
+												 name:kOptOnSaveNotification
+											   object:nil];
+}
+
+-(void)toggleOptimise:(NSNotification*)notif{
+	BOOL isOptOnSave = ((NSNumber*)[[notif userInfo] objectForKey:kOptOnSaveValue]).boolValue;
+	_isOptimiseOnSave = isOptOnSave;
+	
+	[[NSUserDefaults standardUserDefaults] setBool:_isOptimiseOnSave forKey:kOptimiseOnSave];
+	[[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 - (void)windowControllerDidLoadNib:(NSWindowController *)aController {
@@ -63,21 +82,32 @@
     PRBVectorScreenView *screenView = masterView.contentVectorScreenView;
     
     NSMutableString *output = [[NSMutableString alloc] init];
-    
-    int pos = 0;
+	
+	// TODO: Implement direct optimisation of vectorPoints - for now manipulate on output
+	// TODO: Implement proper optimisation - for now just remove spurious points
+	//
+	// Always remove first, if it's a n,0,0,
     BOOL isFirst = YES;
     for (PRBVectorPointView* point in screenView.vectorPoints)
     {
-        if (pos > 0)
-        {
-            [output appendString:[screenView stringValueForPoint:point isFirst:isFirst]];
-            isFirst = NO;
-        }
-        pos++;
+		NSString *curPointAsString = [screenView stringValueForPoint:point isFirst:isFirst];
+		if (isFirst || _isOptimiseOnSave)
+		{
+			if (![curPointAsString hasSuffix:@"0, 0,\n"])
+			{
+				NSInteger startPos = isFirst ? 2 : 0; // Ignore leading newline on first line
+				[output appendString:[curPointAsString substringFromIndex:startPos]];
+			}
+		}
+		else
+			[output appendString:curPointAsString];
+		
+		if (isFirst)
+			isFirst = NO;
     }
     
     if (screenView.vectorPoints.count > 0) {
-        [output appendString:@"\n1,"];
+        [output appendString:@"1"];
     }
     
     return [output dataUsingEncoding:NSUTF8StringEncoding];

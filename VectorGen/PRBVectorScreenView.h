@@ -32,11 +32,14 @@
 
 #define kSnapToGrid @"kSnapToGrid"
 #define kShowGrid @"kShowGrid"
+#define kOptimiseOnSave @"kOptimiseOnSave"
 
 #define kShowGridNotification @"kShowGridNotification"
 #define kShowValue @"kShowValue"
 #define kSnapToGridGridNotification @"kSnapToGridGridNotification"
 #define kSnapValue @"kSnapValue"
+#define kOptOnSaveNotification @"kOptimiseOnSaveNotification"
+#define kOptOnSaveValue @"kOptOnSaveValue"
 
 @property(nonatomic,strong) NSMutableArray* vectorPoints;
 

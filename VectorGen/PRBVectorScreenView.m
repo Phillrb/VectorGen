@@ -43,6 +43,7 @@
 
 @property(nonatomic,assign) BOOL isShowGrid;
 @property(nonatomic,assign) BOOL isSnapToGrid;
+//@property(nonatomic,assign) BOOL isOptimiseOnSave;
 
 @end
 
@@ -302,10 +303,6 @@
     }
 }
 
-
-
-
-
 -(void)redrawVectors
 {
     [self setNeedsDisplay:YES];
@@ -313,10 +310,10 @@
 
 -(NSString*)stringValueForPoint:(PRBVectorPointView*)point isFirst:(BOOL)isFirst{
 
-return [NSString stringWithFormat:@"%@%@, %@,",
-    isFirst ? @"" : @"\n",
+return [NSString stringWithFormat:@"%@, %@,%@",
+    //isFirst ? @"" : @"\n",
     point.isMoveCommand ? @"0": @"255",
-        [point coordinateString]];
+        [point coordinateString], @"\n"];
 }
 
 -(void)drawVectorFromPoint:(PRBVectorPointView*)srcVector toPoint:(PRBVectorPointView*)dstVector{
@@ -545,7 +542,7 @@ return [NSString stringWithFormat:@"%@%@, %@,",
     }
     
     if (tmpVecs.count > 0) {
-        [_vectorTxt setString:[_vectorTxt.string stringByAppendingString:@"\n1,"]];
+        [_vectorTxt setString:[_vectorTxt.string stringByAppendingString:@"1"]];
     }
     
 }
