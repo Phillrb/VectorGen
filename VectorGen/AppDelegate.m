@@ -32,6 +32,7 @@
 
 @property(nonatomic,assign) IBOutlet NSMenuItem *showGridItem;
 @property(nonatomic,assign) IBOutlet NSMenuItem *snapToGridItem;
+@property(nonatomic,assign) IBOutlet NSMenuItem *optimiseOnSave;
 
 @end
 
@@ -68,6 +69,14 @@
     NSNumber *snapBool = sender.state == NSOnState ? @YES : @NO;
     [[NSNotificationCenter defaultCenter] postNotificationName:kSnapToGridGridNotification object:nil userInfo:@{kSnapValue:snapBool}];
     
+}
+
+//Toggle 'Optimise on Save'
+- (IBAction)toggleOptimiseOnSave:(NSMenuItem *)sender {
+	[sender setState:!sender.state];
+	
+	NSNumber *optOnSaveBool = (sender.state == NSOnState) ? @YES : @NO;
+	[[NSNotificationCenter defaultCenter] postNotificationName:kOptOnSaveNotification object:nil userInfo:@{kOptOnSaveValue:optOnSaveBool}];
 }
 
 //Create an image overlay
@@ -111,7 +120,18 @@
         [_showGridItem setState: [defaults boolForKey:kShowGrid] ? NSOnState : NSOffState];
     }
 
-    
+    if (![defaults objectForKey:kOptimiseOnSave])
+	{
+		//Default is YES
+		[defaults setBool:YES forKey:kOptimiseOnSave];
+		[defaults synchronize];
+	}
+	else
+	{
+		//Update menu item
+		bool value = [defaults boolForKey:kOptimiseOnSave];
+		[_optimiseOnSave setState:value ? NSOnState : NSOffState];
+	}
 }
 
 

@@ -158,6 +158,15 @@ CA
                                                 <action selector="toggleSnapToGridItem:" target="Voe-Tx-rLC" id="4Qp-kH-WYv"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem title="Auto Optimise" enabled="NO" id="TMe-Dh-wiQ">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                        </menuItem>
+                                        <menuItem title="Optimise On Save" state="on" id="NqT-wq-MTv">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="toggleOptimiseOnSave:" target="Voe-Tx-rLC" id="DqQ-HZ-SU5"/>
+                                            </connections>
+                                        </menuItem>
                                         <menuItem isSeparatorItem="YES" id="089-sd-5Bc"/>
                                         <menuItem title="Simulate Vectrex" enabled="NO" keyEquivalent="v" id="ebl-0w-ZZr"/>
                                     </items>
@@ -171,6 +180,7 @@ CA
                 </application>
                 <customObject id="Voe-Tx-rLC" customClass="AppDelegate">
                     <connections>
+                        <outlet property="optimiseOnSave" destination="NqT-wq-MTv" id="H3r-FR-typ"/>
                         <outlet property="showGridItem" destination="o48-Yk-RhL" id="OD8-Ic-vLd"/>
                         <outlet property="snapToGridItem" destination="UiI-tO-Osb" id="yY9-am-cQN"/>
                     </connections>
