@@ -36,5 +36,6 @@
 
 @property(nonatomic,assign) id<PRBVectorPointDetailViewDelegate>delegate;
 @property(nonatomic,strong) NSTextField* txtCoord;
+-(void)refreshCoords;
 
 @end

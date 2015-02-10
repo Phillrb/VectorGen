@@ -305,10 +305,9 @@
             return [NSString stringWithFormat:@"%.0f, %.0f",  currentVCoord.y - prevVCoord.y , currentVCoord.x - prevVCoord.x];
         }
     }
-   
+
     //The first point
     return [NSString stringWithFormat:@"%.0f, %.0f", currentVCoord.y, currentVCoord.x];
-    
 }
 
 
@@ -316,7 +315,19 @@
 -(CGPoint)vectrexCoordinateForViewCenter{
     float coordX = [self coordValueToConvertToVectrexCoordValue:self.viewCenter.x isX:YES];
     float coordY = [self coordValueToConvertToVectrexCoordValue:self.viewCenter.y isX:NO];
-    return CGPointMake(coordX, coordY);
+    CGPoint pt = CGPointMake(coordX, coordY);
+    
+    //Snap to grid
+    if(_delegate && [_delegate respondsToSelector:@selector(vectorPointViewShouldSnapToGrid:)])
+    {
+        if([_delegate vectorPointViewShouldSnapToGrid:self])
+        {
+            pt.x = roundUp(pt.x, kGridSpacing);
+            pt.y = roundUp(pt.y, kGridSpacing);
+        }
+    }
+    
+    return pt;
 }
 
 //Get a single nsview location value converted to vectrex scale -128 to 127
@@ -379,7 +390,19 @@
     return NO;
 }
 
-
+//utility for snap to grid - rounding to nearest multiple
+int roundUp(int numToRound, int multiple)
+{
+    if (multiple == 0)
+        return numToRound;
+    
+    int remainder = abs(numToRound) % multiple;
+    if (remainder == 0)
+        return numToRound;
+    if (numToRound < 0)
+        return -(abs(numToRound) - remainder);
+    return numToRound + multiple - remainder;
+}
 
 #pragma mark - connection view
 //Connection point is requesting connect / disconnect

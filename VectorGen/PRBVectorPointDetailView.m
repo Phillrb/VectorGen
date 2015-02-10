@@ -63,17 +63,20 @@
     return nil;
 }
 
-
 -(void)setFrameOrigin:(NSPoint)newOrigin{
     
     [super setFrameOrigin:NSPointFromCGPoint(CGPointMake(newOrigin.x, newOrigin.y + 10.0f))];
     
+    [self refreshCoords];
+}
+
+-(void)refreshCoords
+{
     //Update co-ord
     if(_delegate && [_delegate respondsToSelector:@selector(coordString)])
     {
         [_txtCoord setStringValue:[_delegate coordString]];
     }
-    
 }
 
 - (void)drawRect:(NSRect)rect {

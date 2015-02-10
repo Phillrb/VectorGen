@@ -263,6 +263,9 @@
         [_vectorPoints insertObject:newVectorPoint atIndex:[_vectorPoints indexOfObject:contextPoint] + 1];
     }
     
+    //Refresh detail view coords (visible on vec screen) of point now that it's in the array
+    [newVectorPoint.detailView refreshCoords];
+    
     //Highlight new point
     [self unhighlightCurrentPointAvoiding:nil];
     [newVectorPoint setIsCurrent:YES];
